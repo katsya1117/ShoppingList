@@ -1,4 +1,4 @@
-const SECTION_BUY = "buy";
+﻿const SECTION_BUY = "buy";
 const SECTION_MASTER = "master";
 const CATEGORY_FALLBACK = "Uncategorized";
 const MEMO_STORAGE_KEY = "ShoppingListApp:memoItems";
@@ -8,12 +8,14 @@ let categoriesLookup = [];
 let masterCatalogModal = null;
 let antiForgeryToken = null;
 
+// Helper that builds Razor handler URLs
 function buildHandlerUrl(handler) {
     const base = window.location.pathname || "/";
     const separator = base.includes("?") ? "&" : "?";
     return `${base}${separator}handler=${handler}`;
 }
 
+// Reads the anti-forgery token from the hidden input
 function getAntiForgeryToken() {
     if (!antiForgeryToken) {
         const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
@@ -22,6 +24,7 @@ function getAntiForgeryToken() {
     return antiForgeryToken;
 }
 
+// Ensures a nickname is stored in localStorage for server calls
 function ensureNick() {
     let nick = localStorage.getItem("nick");
     if (!nick) {
@@ -31,6 +34,7 @@ function ensureNick() {
     return nick;
 }
 
+// Bootstraps all JavaScript features on the index page
 export function initializeIndexPage() {
     masterCatalogModal = getModal("masterCatalogModal");
     const openMasterButton = document.getElementById("open-master-catalog-button");
@@ -51,6 +55,7 @@ export function initializeIndexPage() {
     updateEmptyPlaceholder(SECTION_MASTER);
 }
 
+// Provides a modal helper that works with or without Bootstrap
 function getModal(id) {
     const el = document.getElementById(id);
     if (!el) {
@@ -73,6 +78,7 @@ function getModal(id) {
     };
 }
 
+// Wires the Buy List modal choices and memo form
 function setupBuyListUI() {
     const buyModal = getModal("buyAddModal");
     const memoModal = getModal("memoModal");
@@ -112,7 +118,6 @@ function setupBuyListUI() {
     });
 }
 
-function setupBuyListActions() {
     const buyRoot = getSectionRoot(SECTION_BUY);
     if (!buyRoot) {
         return;
@@ -160,6 +165,7 @@ function setupBuyListActions() {
     });
 }
 
+// Reflects purchase checkbox changes to UI and server
 async function handleMarkPurchased(item, checked) {
     item.classList.toggle("completed", checked);
     const linked = item.dataset.linked === "true";
@@ -173,6 +179,7 @@ async function handleMarkPurchased(item, checked) {
     }
 }
 
+// Sets up search and creation form inside the Master modal
 function setupMasterUI() {
     const masterAddModal = getModal("masterAddModal");
     const masterForm = document.getElementById("master-form");
@@ -211,6 +218,7 @@ function setupMasterUI() {
     });
 }
 
+// Watches for toggle clicks within the Master list
 function setupMasterInteractions() {
     const container = document.getElementById("master-categories");
     if (!container) {
@@ -229,6 +237,7 @@ function setupMasterInteractions() {
     });
 }
 
+// Sends availability toggles when a master item button is pressed
 async function handleMasterToggle(item) {
     const itemId = Number(item.dataset.itemId);
     if (!itemId) {
@@ -239,6 +248,7 @@ async function handleMasterToggle(item) {
     await toggleAvailability(itemId, targetAvailability);
 }
 
+// Calls the Razor handler to update stock status and sync UI
 export async function toggleAvailability(itemId, isAvailable, options = {}) {
     const nick = ensureNick();
     const headers = { "Content-Type": "application/json" };
@@ -272,6 +282,7 @@ export async function toggleAvailability(itemId, isAvailable, options = {}) {
     return payload;
 }
 
+// Updates the master list row using the server response
 function applyMasterStateUpdate(payload) {
     if (!payload) {
         return;
@@ -305,6 +316,7 @@ function applyMasterStateUpdate(payload) {
     }
 }
 
+// Inserts a linked master item into the Buy List section
 function moveItemToBuyList(itemId) {
     const masterItem = document.querySelector(`[data-master-item][data-item-id="${itemId}"]`);
     if (!masterItem) {
@@ -346,6 +358,7 @@ function moveItemToBuyList(itemId) {
     updateEmptyPlaceholder(SECTION_BUY);
 }
 
+// Removes a linked item when it becomes available
 function moveItemToAvailableList(itemId) {
     const listItem = document.querySelector(`li[data-section="buy"][data-linked="true"][data-item-id="${itemId}"]`);
     if (listItem) {
@@ -355,6 +368,7 @@ function moveItemToAvailableList(itemId) {
     }
 }
 
+// Finds or builds the Buy List category container
 function findOrCreateBuyCategoryBlock(categoryName) {
     const root = getSectionRoot(SECTION_BUY);
     if (!root) {
@@ -407,6 +421,7 @@ function findOrCreateBuyCategoryBlock(categoryName) {
     return block;
 }
 
+// Finds or builds the Master category container
 function findOrCreateMasterCategoryBlock(categoryName) {
     const container = document.getElementById("master-categories");
     if (!container) {
@@ -440,6 +455,7 @@ function findOrCreateMasterCategoryBlock(categoryName) {
     return block;
 }
 
+// Updates the badge showing the number of items per category
 function updateMasterCategoryCount(block) {
     if (!block) {
         return;
@@ -451,6 +467,7 @@ function updateMasterCategoryCount(block) {
     }
 }
 
+// Removes empty category blocks from a given section
 function cleanupEmptyCategoryBlocks(section) {
     const root = getSectionRoot(section);
     if (!root) {
@@ -468,6 +485,7 @@ function cleanupEmptyCategoryBlocks(section) {
     });
 }
 
+// Toggles the empty-state message depending on item count
 function updateEmptyPlaceholder(section) {
     const root = getSectionRoot(section);
     if (!root) {
@@ -489,12 +507,14 @@ function updateEmptyPlaceholder(section) {
     placeholder.style.display = hasItems ? "none" : "";
 }
 
+// Returns the root element for the requested section
 function getSectionRoot(section) {
     return section === SECTION_MASTER
         ? document.getElementById("master-modal-body")
         : document.getElementById("tab-buy");
 }
 
+// Caches category id-to-name pairs for later lookup
 function buildCategoriesLookup() {
     const select = document.getElementById("MasterForm_CategoryId");
     if (!select) {
@@ -505,6 +525,7 @@ function buildCategoriesLookup() {
         .map((option) => ({ id: option.value, name: option.textContent || "" }));
 }
 
+// Filters master items by free-text search
 function filterMasterItems(query) {
     const container = document.getElementById("master-categories");
     if (!container) {
@@ -527,6 +548,7 @@ function filterMasterItems(query) {
     updateEmptyPlaceholder(SECTION_MASTER);
 }
 
+// Submits the master creation form via fetch and returns data
 async function createMasterItem(formData, action) {
     try {
         const res = await fetch(action || buildHandlerUrl("CreateMaster"), {
@@ -562,6 +584,7 @@ async function createMasterItem(formData, action) {
     }
 }
 
+// Renders a new master item row in the modal
 function appendMasterItem(item, inList) {
     const block = findOrCreateMasterCategoryBlock(item.category || CATEGORY_FALLBACK);
     if (!block) {
@@ -598,6 +621,7 @@ function appendMasterItem(item, inList) {
     updateMasterCategoryCount(block);
 }
 
+// Checks whether a master item already exists by name and category
 function isDuplicateMaster(name, categoryName) {
     const normalizedName = normalizeText(name);
     const normalizedCategory = normalizeText(categoryName);
@@ -609,6 +633,7 @@ function isDuplicateMaster(name, categoryName) {
     });
 }
 
+// Loads memo-only items from localStorage
 function loadMemoItems() {
     try {
         const raw = localStorage.getItem(MEMO_STORAGE_KEY);
@@ -618,6 +643,7 @@ function loadMemoItems() {
     }
 }
 
+// Persists memo-only items to localStorage
 function saveMemoItems() {
     try {
         localStorage.setItem(MEMO_STORAGE_KEY, JSON.stringify(memoItems));
@@ -626,6 +652,7 @@ function saveMemoItems() {
     }
 }
 
+// Repaints memo items in the Buy List view
 function renderMemoItems() {
     document.querySelectorAll("li[data-section='buy'][data-linked='false']").forEach((node) => node.remove());
     memoItems.forEach((memo) => addMemoItemToDom(memo));
@@ -633,6 +660,7 @@ function renderMemoItems() {
     updateEmptyPlaceholder(SECTION_BUY);
 }
 
+// Adds a memo item to memory and the DOM
 function addMemoItem(memo) {
     if (!memo || !memo.name) {
         return;
@@ -643,6 +671,7 @@ function addMemoItem(memo) {
     updateEmptyPlaceholder(SECTION_BUY);
 }
 
+// Builds the HTML for a memo item in the Buy List
 function addMemoItemToDom(memo) {
     const block = findOrCreateBuyCategoryBlock(CATEGORY_FALLBACK);
     if (!block) {
@@ -671,6 +700,7 @@ function addMemoItemToDom(memo) {
     list.appendChild(element);
 }
 
+// Removes a memo item from storage and the DOM
 function removeMemoItem(id) {
     if (!id) {
         return;
@@ -682,15 +712,18 @@ function removeMemoItem(id) {
     updateEmptyPlaceholder(SECTION_BUY);
 }
 
+// Resolves a category id to its display name
 function getCategoryNameById(categoryId) {
     const lookup = categoriesLookup.find((c) => c.id === String(categoryId));
     return lookup ? lookup.name : "";
 }
 
+// Normalises text for case-insensitive comparisons
 function normalizeText(value) {
     return (value || "").trim().toLowerCase();
 }
 
+// Escapes HTML-sensitive characters in a string
 function escapeHtml(value) {
     return (value || "")
         .replace(/&/g, "&amp;")
@@ -700,6 +733,7 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+// Escapes values so they are safe in CSS selectors
 function cssEscape(value) {
     if (window.CSS && typeof window.CSS.escape === "function") {
         return window.CSS.escape(value);
@@ -707,6 +741,7 @@ function cssEscape(value) {
     return String(value).replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
+// Formats ISO date strings into a friendly timestamp
 function formatDateTime(value) {
     if (!value) {
         return "-";
@@ -722,3 +757,4 @@ function formatDateTime(value) {
     const min = String(date.getMinutes()).padStart(2, "0");
     return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
 }
+

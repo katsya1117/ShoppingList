@@ -51,11 +51,13 @@ public class IndexModel : PageModel
         public string? UpdatedBy { get; set; }
     }
 
+    // ページ初期表示で必要なデータを読み込んでビューへ渡す
     public async Task OnGetAsync()
     {
         await LoadPageAsync();
     }
 
+    // 新しいマスタ項目をサーバー側で追加する
     public async Task<IActionResult> OnPostCreateMasterAsync([FromForm] MasterItemInput masterForm)
     {
         if (!ModelState.IsValid)
@@ -110,6 +112,7 @@ public class IndexModel : PageModel
         });
     }
 
+    // マスタと買い物リストの在庫状態を切り替える
     public async Task<IActionResult> OnPostToggleAvailabilityAsync([FromBody] ToggleAvailabilityRequest request)
     {
         if (request is null || request.ItemId <= 0)
@@ -143,6 +146,7 @@ public class IndexModel : PageModel
         });
     }
 
+    // データベースからマスタ一覧と買い物リストを再構築する
     private async Task LoadPageAsync()
     {
         Categories = await _db.Categories
