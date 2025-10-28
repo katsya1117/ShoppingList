@@ -1,0 +1,122 @@
+@page
+@model ShoppingListApp.Pages.AddModel
+@{
+    ViewData["Title"] = "アイテム追加";
+}
+
+<h2>アイテム追加</h2>
+
+<div>
+    <label for="name">品名</label>
+    <input id="name" type="text" placeholder="例: 醤油 / ティッシュ" autocomplete="off" />
+</div>
+
+<div id="suggest-section" style="margin-top:1rem;">
+    <strong>候補</strong>
+    <ul id="suggest" style="list-style:none; padding-left:0;"></ul>
+</div>
+
+<div id="new-section" style="margin-top:1rem; display:none;">
+    <div>マスタにありません。新規追加しますか？</div>
+    <label for="category">カテゴリ</label>
+    <select id="category">
+        <option value="0">カテゴリを選択</option>
+        @foreach (var c in Model.Categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+    <button id="addNewBtn" type="button">マスタに追加</button>
+</div>
+
+<div style="margin-top:1.5rem;">
+    <a href="/">一覧へ戻る</a>
+  </div>
+
+<script>
+const K = "abc123"; // 固定キー
+
+const input = document.getElementById('name');
+const suggestList = document.getElementById('suggest');
+const newSection = document.getElementById('new-section');
+const addNewBtn = document.getElementById('addNewBtn');
+const categorySel = document.getElementById('category');
+
+let lastQuery = "";
+
+function debounce(fn, ms){
+  let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+}
+
+input.addEventListener('input', debounce(async () => {
+  const q = input.value.trim();
+  lastQuery = q;
+  suggestList.innerHTML = '';
+  if(!q){ newSection.style.display='none'; return; }
+
+  const res = await fetch(`/api/items?prefix=${encodeURIComponent(q)}&k=${K}`);
+  if(!res.ok){ alert('候補取得に失敗'); return; }
+  const data = await res.json();
+
+  // 候補表示
+  if (data.items && data.items.length > 0){
+    newSection.style.display = 'none';
+    for (const it of data.items){
+      const li = document.createElement('li');
+      li.style.padding = '6px 0';
+      const name = document.createElement('span');
+      name.textContent = `${it.name}（${it.category}）`;
+      const btn = document.createElement('button');
+      btn.textContent = '在庫なしにする（追加）';
+      btn.style.marginLeft = '8px';
+      btn.onclick = () => addExisting(it.id);
+      li.appendChild(name); li.appendChild(btn);
+      suggestList.appendChild(li);
+    }
+  } else {
+    // 0件 → 新規追加UI
+    newSection.style.display = '';
+  }
+}, 200));
+
+async function addExisting(id){
+  const nick = localStorage.getItem('nick') || prompt('名前') || 'anon';
+  localStorage.setItem('nick', nick);
+  const res = await fetch(`/api/availability/${id}?k=${K}`,{
+    method:'PATCH',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ isAvailable:false, updatedBy:nick })
+  });
+  if(res.ok){
+    alert('在庫なし（買うもの）に設定しました');
+  }else{
+    alert('更新に失敗');
+  }
+}
+
+addNewBtn.addEventListener('click', async () => {
+  const name = lastQuery.trim();
+  const cid = parseInt(categorySel.value, 10) || 0;
+  if(!name){ alert('品名を入力してください'); return; }
+  if(cid <= 0){ alert('カテゴリを選択してください'); return; }
+
+  const res = await fetch(`/api/items?k=${K}`,{
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ name, categoryId: cid })
+  });
+  if(res.status === 201){
+    alert('マスタに追加しました（在庫なしで初期化）');
+    // 入力状態を軽くリセット
+    input.value = '';
+    suggestList.innerHTML='';
+    newSection.style.display='none';
+  }else if(res.status === 409){
+    alert('すでに存在します');
+  }else{
+    const t = await res.text();
+    alert('追加に失敗: ' + t);
+  }
+});
+</script>
+
