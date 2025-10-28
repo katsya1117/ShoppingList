@@ -318,3 +318,4 @@ C:\Mac\Home\Documents\_dev\csharp\ShoppingListApp\obj\Debug\net8.0\refint\Shoppi
 C:\Mac\Home\Documents\_dev\csharp\ShoppingListApp\obj\Debug\net8.0\ShoppingListApp.pdb
 C:\Mac\Home\Documents\_dev\csharp\ShoppingListApp\obj\Debug\net8.0\ShoppingListApp.genruntimeconfig.cache
 C:\Mac\Home\Documents\_dev\csharp\ShoppingListApp\obj\Debug\net8.0\ref\ShoppingListApp.dll
+C:\Mac\Home\Documents\_dev\csharp\ShoppingListApp\obj\Debug\net8.0\ShoppingListApp.sourcelink.json

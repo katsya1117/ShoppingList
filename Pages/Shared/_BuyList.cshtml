@@ -1,0 +1,48 @@
+@model ShoppingListApp.Pages.IndexModel
+
+<p data-empty-placeholder class="text-muted" style="display:@(Model.BuyList.Any() ? "none" : "")">
+    Nothing to buy right now.
+</p>
+
+<div data-buy-container="true">
+    @foreach (var group in Model.BuyList
+        .GroupBy(x => string.IsNullOrWhiteSpace(x.Category) ? "Uncategorized" : x.Category)
+        .OrderBy(g => g.Key == "Uncategorized" ? 0 : 1)
+        .ThenBy(g => g.Key))
+    {
+        var isMemoGroup = group.Key == "Uncategorized";
+        var heading = isMemoGroup ? string.Empty : group.Key;
+        <article class="mb-4" data-category-block="@group.Key" data-section="buy">
+            @if (!string.IsNullOrWhiteSpace(heading))
+            {
+                <h3 class="h6 text-uppercase text-muted mb-2">@heading</h3>
+            }
+            <ul class="list-group shadow-sm">
+                @foreach (var it in group)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center gap-3"
+                        data-item-id="@it.Id"
+                        data-item-name="@it.Name"
+                        data-category="@group.Key"
+                        data-section="buy"
+                        data-linked="@(!isMemoGroup).ToString().ToLower()">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1">
+                            <input class="form-check-input" type="checkbox" data-action="mark-purchased" />
+                            <div class="buy-item-label">
+                                @if (!isMemoGroup)
+                                {
+                                    <i class="bi bi-link-45deg text-primary" aria-hidden="true"></i>
+                                }
+                                <span class="buy-item-text fw-semibold">@it.Name</span>
+                            </div>
+                        </div>
+                        @if (isMemoGroup)
+                        {
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-action="remove-item">Remove</button>
+                        }
+                    </li>
+                }
+            </ul>
+        </article>
+    }
+</div>

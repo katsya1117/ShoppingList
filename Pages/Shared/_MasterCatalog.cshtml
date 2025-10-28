@@ -1,0 +1,72 @@
+@model ShoppingListApp.Pages.IndexModel
+
+<div class="mb-3">
+    <div class="input-group input-group-sm" style="max-width: 320px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" id="master-search" placeholder="Search master items" autocomplete="off" />
+    </div>
+</div>
+
+<p data-empty-placeholder class="text-muted" style="display:@(Model.MasterItems.Any() ? "none" : "")">
+    No master items yet.
+</p>
+
+<div id="master-categories" class="d-flex flex-column gap-4">
+    @foreach (var group in Model.MasterItems
+        .GroupBy(x => string.IsNullOrWhiteSpace(x.Category) ? "Uncategorized" : x.Category)
+        .OrderBy(g => g.Key))
+    {
+        <div class="master-category" data-category-block="@group.Key" data-section="master">
+            @{ var displayCategory = group.Key == "Uncategorized" ? string.Empty : group.Key; }
+            @if (!string.IsNullOrWhiteSpace(displayCategory))
+            {
+                <h3 class="h6 text-uppercase text-muted mb-2">@displayCategory <span class="badge bg-light text-secondary">@group.Count()</span></h3>
+            }
+            <ul class="list-group shadow-sm">
+                @foreach (var it in group.OrderBy(x => x.Name))
+                {
+                    var inList = !it.IsAvailable;
+                    var updatedIso = it.LastUpdated.HasValue ? it.LastUpdated.Value.ToUniversalTime().ToString("o") : string.Empty;
+                    var updatedDisplay = it.LastUpdated.HasValue ? it.LastUpdated.Value.ToLocalTime().ToString("yyyy/MM/dd HH:mm") : "-";
+                    <li class="list-group-item d-flex align-items-center gap-3"
+                        data-master-item
+                        data-item-id="@it.Id"
+                        data-item-name="@it.Name"
+                        data-category="@group.Key"
+                        data-in-list="@(inList.ToString().ToLower())"
+                        data-updated="@updatedIso">
+                        <button type="button"
+                                class="master-toggle @(inList ? "is-active" : "")"
+                                data-action="master-toggle"
+                                aria-label="Toggle list state"
+                                aria-pressed="@(inList.ToString().ToLower())">
+                            <svg class="icon-check-circle text-primary @(inList ? "" : "d-none")" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" aria-hidden="true">
+                                <path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm3.28 5.72a.75.75 0 0 0-1.06-1.06L7 7.94 5.78 6.72a.75.75 0 1 0-1.06 1.06l1.75 1.75a.75.75 0 0 0 1.06 0z" />
+                            </svg>
+                            <svg class="icon-plus-circle text-secondary @(inList ? "d-none" : "")" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" aria-hidden="true">
+                                <path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 3.5a.5.5 0 0 0-1 0V7H3.5a.5.5 0 0 0 0 1H7v3.5a.5.5 0 0 0 1 0V8h3.5a.5.5 0 0 0 0-1H8.5z" />
+                            </svg>
+                            <span class="visually-hidden">@(inList ? "In the list" : "Add to list")</span>
+                        </button>
+                        <div class="flex-grow-1 fw-semibold">@it.Name</div>
+                        <span class="text-muted small" data-role="last-updated">@updatedDisplay</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+<div class="d-flex justify-content-end mt-4">
+    <button type="button"
+            class="btn btn-primary btn-circle d-flex align-items-center justify-content-center"
+            id="master-add-button"
+            data-bs-toggle="modal"
+            data-bs-target="#masterAddModal"
+            aria-label="Add master item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M7.5 1.5a.5.5 0 0 1 1 0V7h5.5a.5.5 0 0 1 0 1H8.5v5.5a.5.5 0 0 1-1 0V8H2a.5.5 0 0 1 0-1h5.5z" />
+        </svg>
+        <span class="visually-hidden">Add master item</span>
+    </button>
+</div>

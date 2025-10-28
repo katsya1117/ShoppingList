@@ -1,4 +1,3 @@
-const SECRET_KEY = "abc123";
 const SECTION_BUY = "buy";
 const SECTION_MASTER = "master";
 const CATEGORY_FALLBACK = "Uncategorized";
@@ -7,6 +6,21 @@ const MEMO_STORAGE_KEY = "ShoppingListApp:memoItems";
 let memoItems = [];
 let categoriesLookup = [];
 let masterCatalogModal = null;
+let antiForgeryToken = null;
+
+function buildHandlerUrl(handler) {
+    const base = window.location.pathname || "/";
+    const separator = base.includes("?") ? "&" : "?";
+    return `${base}${separator}handler=${handler}`;
+}
+
+function getAntiForgeryToken() {
+    if (!antiForgeryToken) {
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        antiForgeryToken = tokenInput?.value || "";
+    }
+    return antiForgeryToken;
+}
 
 function ensureNick() {
     let nick = localStorage.getItem("nick");
@@ -168,27 +182,30 @@ function setupMasterUI() {
 
     masterForm?.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const nameInput = document.getElementById("master-item-name");
-        const categorySelect = document.getElementById("master-item-category");
-        const name = nameInput?.value.trim();
-        const categoryId = Number(categorySelect?.value ?? 0);
+        const form = event.target;
+        const formData = new FormData(form);
+        const rawName = formData.get("MasterForm.Name");
+        const name = (rawName ?? "").toString().trim();
+        const categoryId = Number(formData.get("MasterForm.CategoryId") ?? 0);
         if (!name || categoryId <= 0) {
             alert("Please enter item name and category.");
             return;
         }
 
-        const categoryName = getCategoryNameById(categorySelect.value) || CATEGORY_FALLBACK;
+        formData.set("MasterForm.Name", name);
+
+        const categoryName = getCategoryNameById(String(categoryId)) || CATEGORY_FALLBACK;
         if (isDuplicateMaster(name, categoryName)) {
             alert("Item already exists in master list.");
             return;
         }
 
-        const created = await createMasterItem(name, categoryId);
+        const created = await createMasterItem(formData, form.getAttribute("action") || buildHandlerUrl("CreateMaster"));
         if (created) {
             appendMasterItem(created, true);
             moveItemToBuyList(created.id);
             masterAddModal?.hide();
-            masterForm.reset();
+            form.reset();
             updateEmptyPlaceholder(SECTION_MASTER);
         }
     });
@@ -224,10 +241,15 @@ async function handleMasterToggle(item) {
 
 export async function toggleAvailability(itemId, isAvailable, options = {}) {
     const nick = ensureNick();
-    const res = await fetch(`/api/availability/${itemId}?k=${SECRET_KEY}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isAvailable, updatedBy: nick })
+    const headers = { "Content-Type": "application/json" };
+    const token = getAntiForgeryToken();
+    if (token) {
+        headers["RequestVerificationToken"] = token;
+    }
+    const res = await fetch(buildHandlerUrl("ToggleAvailability"), {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ itemId, isAvailable, updatedBy: nick })
     });
 
     if (!res.ok) {
@@ -474,7 +496,7 @@ function getSectionRoot(section) {
 }
 
 function buildCategoriesLookup() {
-    const select = document.getElementById("master-item-category");
+    const select = document.getElementById("MasterForm_CategoryId");
     if (!select) {
         return [];
     }
@@ -505,15 +527,20 @@ function filterMasterItems(query) {
     updateEmptyPlaceholder(SECTION_MASTER);
 }
 
-async function createMasterItem(name, categoryId) {
+async function createMasterItem(formData, action) {
     try {
-        const res = await fetch(`/api/items?k=${SECRET_KEY}`, {
+        const res = await fetch(action || buildHandlerUrl("CreateMaster"), {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, categoryId })
+            body: formData
         });
         if (res.status === 409) {
             alert("Item already exists in master list.");
+            return null;
+        }
+        if (res.status === 400) {
+            const payload = await res.json().catch(() => null);
+            const message = payload?.errors?.join("\n") || "Failed to add master item.";
+            alert(message);
             return null;
         }
         if (!res.ok) {
@@ -526,7 +553,7 @@ async function createMasterItem(name, categoryId) {
             id: data.id,
             name: data.name,
             category: data.category,
-            updatedAt: new Date().toISOString()
+            updatedAt: data.updatedAt || new Date().toISOString()
         };
     } catch (error) {
         console.error(error);
@@ -695,5 +722,3 @@ function formatDateTime(value) {
     const min = String(date.getMinutes()).padStart(2, "0");
     return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
 }
-
-
