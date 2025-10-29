@@ -55,5 +55,15 @@
     "C:\\Users\\kty\\.nuget\\packages\\system.text.json\\9.0.10\\system.text.json.9.0.10.nupkg.sha512",
     "C:\\Users\\kty\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "パッケージの脆弱性データの取得中にエラーが発生しました: ソース https://api.nuget.org/v3/index.json のサービス インデックスを読み込めません。",
+      "projectPath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

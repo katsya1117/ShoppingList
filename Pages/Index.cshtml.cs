@@ -70,8 +70,11 @@ public class IndexModel : PageModel
         }
 
         var trimmedName = masterForm.Name.Trim();
+        var normalizedName = trimmedName.ToLower();
         var exists = await _db.Items
-            .AnyAsync(i => i.Name.ToLower() == trimmedName.ToLower());
+            .AnyAsync(i =>
+                i.CategoryId == masterForm.CategoryId &&
+                i.Name.ToLower() == normalizedName);
         if (exists)
         {
             return StatusCode(StatusCodes.Status409Conflict, new { message = "Item already exists in master list." });

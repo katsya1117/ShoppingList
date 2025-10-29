@@ -118,6 +118,8 @@ function setupBuyListUI() {
     });
 }
 
+// Handles Buy List checkbox and remove interactions
+function setupBuyListActions() {
     const buyRoot = getSectionRoot(SECTION_BUY);
     if (!buyRoot) {
         return;
@@ -757,4 +759,5 @@ function formatDateTime(value) {
     const min = String(date.getMinutes()).padStart(2, "0");
     return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
 }
+
 
