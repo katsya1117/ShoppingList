@@ -1,5 +1,6 @@
 ﻿namespace ShoppingListApp.Models;
 
+// ID、項目名、カテゴリID、カテゴリ
 public class Item
 {
     public int Id {get;set; }
