@@ -7,7 +7,12 @@ using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "app.db");
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlite($"Data Source={dbPath}"));
+builder.Services.AddDbContext<AppDbContext>(o =>
+{
+    o.UseSqlite($"Data Source={dbPath}");
+    o.EnableDetailedErrors();
+    o.EnableSensitiveDataLogging();
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();

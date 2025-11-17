@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ShoppingListApp.Data;
 using ShoppingListApp.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ShoppingListApp.Pages;
 
@@ -15,6 +16,7 @@ namespace ShoppingListApp.Pages;
 public class IndexModel : PageModel
 {
     private readonly AppDbContext _db;
+    private readonly ILogger<IndexModel> _log;
 
     /// <summary>マスタ一覧（カテゴリ別にソート済み）をビューへ渡すためのコレクション。</summary>
     public List<ItemView> MasterItems { get; private set; } = new();
@@ -29,9 +31,10 @@ public class IndexModel : PageModel
     [BindProperty]
     public MasterItemInput MasterForm { get; set; } = new();
 
-    public IndexModel(AppDbContext db)
+    public IndexModel(AppDbContext db, ILogger<IndexModel> log)
     {
         _db = db;
+        _log = log;
     }
 
     /// <summary>ビューで扱いやすいように整形したマスタ／買い物リストの1アイテム情報。</summary>
@@ -69,14 +72,18 @@ public class IndexModel : PageModel
     /// </summary>
     public async Task OnGetAsync()
     {
+        _log.LogInformation("OnGetAsync: start");
         await LoadPageAsync();
+        _log.LogInformation("OnGetAsync: done. MasterItems={MasterCount}, BuyList={BuyCount}, Categories={CatCount}",
+            MasterItems.Count, BuyList.Count, Categories.Count);
     }
 
     /// <summary>
     /// マスタ追加モーダルから送信された入力を検証し、新しいマスタ項目を登録して JSON で返す。
     /// </summary>
-    public async Task<IActionResult> OnPostCreateMasterAsync([FromForm] MasterItemInput masterForm)
+    public async Task<IActionResult> OnPostCreateMasterAsync()
     {
+        _log.LogInformation("CreateMaster: start Name='{Name}', CategoryId={Cat}", MasterForm?.Name, MasterForm?.CategoryId);
         // Razor サイドの検証属性ではじかれなかったか再確認し、エラーを集めて返す
         if (!ModelState.IsValid)
         {
@@ -84,16 +91,18 @@ public class IndexModel : PageModel
                 .SelectMany(v => v.Errors)
                 .Select(e => e.ErrorMessage)
                 .ToArray();
+            _log.LogWarning("CreateMaster: invalid model. errors={Count}: {Errors}", errors.Length, string.Join(" | ", errors));
             return BadRequest(new { errors });
         }
 
         // 名前を正規化して、同一カテゴリ内に重複がないかをチェックする
-        var trimmedName = masterForm.Name.Trim();
+        var trimmedName = MasterForm.Name.Trim();
         var normalizedName = trimmedName.ToLower();
         var exists = await _db.Items
             .AnyAsync(i =>
-                i.CategoryId == masterForm.CategoryId &&
+                i.CategoryId == MasterForm.CategoryId &&
                 i.Name.ToLower() == normalizedName);
+        _log.LogInformation("CreateMaster: duplicate exists={Exists}", exists);
         if (exists)
         {
             return StatusCode(StatusCodes.Status409Conflict, new { message = "Item already exists in master list." });
@@ -101,7 +110,8 @@ public class IndexModel : PageModel
 
         // 選択されたカテゴリが DB 上に存在するか確認する（削除済みなどのケースを防ぐ）
         var category = await _db.Categories
-            .FirstOrDefaultAsync(c => c.Id == masterForm.CategoryId);
+            .FirstOrDefaultAsync(c => c.Id == MasterForm.CategoryId);
+        _log.LogInformation("CreateMaster: category found={Found}", category != null);
         if (category is null)
         {
             return BadRequest(new { message = "Selected category does not exist." });
@@ -111,11 +121,12 @@ public class IndexModel : PageModel
         var item = new Item
         {
             Name = trimmedName,
-            CategoryId = masterForm.CategoryId
+            CategoryId = MasterForm.CategoryId
         };
 
         _db.Items.Add(item);
         await _db.SaveChangesAsync();
+        _log.LogInformation("CreateMaster: item inserted Id={Id}", item.Id);
 
         // 新規作成直後は「在庫なし」状態として Availability を初期化する
         var availability = new ItemAvailability
@@ -127,6 +138,7 @@ public class IndexModel : PageModel
         };
         _db.ItemAvailabilities.Add(availability);
         await _db.SaveChangesAsync();
+        _log.LogInformation("CreateMaster: availability inserted IsAvailable={Avail}, UpdatedAt={Time}", availability.IsAvailable, availability.UpdatedAt);
 
         // フロント側でリストに追加しやすいよう JSON を返す
         return new JsonResult(new
@@ -187,18 +199,25 @@ public class IndexModel : PageModel
         // カテゴリはプルダウン用に名前順で取得
         Categories = await _db.Categories
             .OrderBy(c => c.Name)
+            .AsNoTracking()
             .ToListAsync();
+        _log.LogInformation("LoadPage: Categories loaded: {Count}", Categories.Count);
 
         // Item をカテゴリ名→品名の順でソートしながら読み込む
         var items = await _db.Items
             .Include(i => i.Category)
+            .AsNoTracking()
             .OrderBy(i => i.Category != null ? i.Category.Name : string.Empty)
             .ThenBy(i => i.Name)
             .ToListAsync();
+        _log.LogInformation("LoadPage: Items loaded: {Count}", items.Count);
 
         // Availability をディクショナリ化して参照しやすくする
         var availability = await _db.ItemAvailabilities
+            .AsNoTracking()
             .ToDictionaryAsync(a => a.ItemId);
+        _log.LogInformation("LoadPage: Availability loaded: {Count}", availability.Count);
+
 
         // Item + Availability を組み合わせてビュー用の ItemView リストを構築
         MasterItems = items.Select(i =>
@@ -213,10 +232,12 @@ public class IndexModel : PageModel
                 LastUpdated = record?.UpdatedAt
             };
         }).ToList();
+        _log.LogInformation("LoadPage: MasterItems projected: {Count}", MasterItems.Count);
 
         // 在庫なしのものだけが買い物リストに並ぶ
         BuyList = MasterItems
             .Where(x => !x.IsAvailable)
             .ToList();
+        _log.LogInformation("LoadPage: BuyList filtered: {Count}", BuyList.Count);
     }
 }

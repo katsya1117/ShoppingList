@@ -1,0 +1,6 @@
+# Visual Studio cache files
+.vs/
+
+# bin/ and obj/ folders
+[Bb]in/
+[Oo]bj/
