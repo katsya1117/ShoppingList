@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pKHD9kQuWkE=",
+  "dgSpecHash": "pRGgO6W+TiM=",
   "success": true,
-  "projectFilePath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp.csproj",
+  "projectFilePath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\ShoppingListApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kty\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\kty\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

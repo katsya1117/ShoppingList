@@ -1,12 +1,113 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\HelloWorldTests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|c:\\mac\\home\\documents\\_dev\\csharp\\shoppinglistapp\\shoppinglistapp\\shoppinglistapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|solutionrelative:shoppinglistapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|c:\\mac\\home\\documents\\_dev\\csharp\\shoppinglistapp\\shoppinglistapp\\pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|solutionrelative:pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|c:\\mac\\home\\documents\\_dev\\csharp\\shoppinglistapp\\shoppinglistapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|c:\\mac\\home\\documents\\_dev\\csharp\\shoppinglistapp\\shoppinglistapp\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{930D8BB2-CBA1-4423-BC16-13BC065C80B8}|ShoppingListApp.csproj|solutionrelative:pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\ShoppingListApp.Tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ShoppingListApp.csproj",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\ShoppingListApp.csproj",
+              "RelativeDocumentMoniker": "ShoppingListApp.csproj",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\ShoppingListApp.csproj",
+              "RelativeToolTip": "ShoppingListApp.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-18T11:12:37.326Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HelloWorldTests.cs",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\HelloWorldTests.cs",
+              "RelativeDocumentMoniker": "..\\..\\ShoppingListApp.Tests\\HelloWorldTests.cs",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\HelloWorldTests.cs",
+              "RelativeToolTip": "..\\..\\ShoppingListApp.Tests\\HelloWorldTests.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-18T11:04:14.759Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ShoppingListApp.Tests.csproj",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\ShoppingListApp.Tests.csproj",
+              "RelativeDocumentMoniker": "..\\..\\ShoppingListApp.Tests\\ShoppingListApp.Tests.csproj",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp.Tests\\ShoppingListApp.Tests.csproj",
+              "RelativeToolTip": "..\\..\\ShoppingListApp.Tests\\ShoppingListApp.Tests.csproj",
+              "ViewState": "AgIAAAAAAAAAZmZmZmbmvxMAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-18T11:03:00.797Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Pages\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Index.cshtml.cs",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Pages\\Index.cshtml.cs",
+              "RelativeToolTip": "Pages\\Index.cshtml.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAowBcAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-18T10:15:42.444Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Pages\\Index.cshtml",
+              "RelativeDocumentMoniker": "Pages\\Index.cshtml",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Pages\\Index.cshtml",
+              "RelativeToolTip": "Pages\\Index.cshtml",
+              "ViewState": "AgIAAAYAAACA/P////8LwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-18T10:15:19.569Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Mac\\Home\\Documents\\_dev\\csharp\\ShoppingListApp\\ShoppingListApp\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAawJgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-18T10:08:59.132Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
