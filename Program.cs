@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using ShoppingListApp.Api;
 using ShoppingListApp.Data;
 using ShoppingListApp.Models;
 using System.IO;
@@ -13,6 +14,9 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.EnableDetailedErrors();
     o.EnableSensitiveDataLogging();
 });
+
+builder.Services.Configure<ApiOptions>(builder.Configuration.GetSection(ApiOptions.SectionName));
+builder.Services.AddScoped<ApiKeyEndpointFilter>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -35,6 +39,9 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+var api = app.MapGroup("/api")
+    .AddEndpointFilter<ApiKeyEndpointFilter>();
+
 // Ensure database exists and is up-to-date
 using (var scope = app.Services.CreateScope())
 {
@@ -51,17 +58,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-const string SecretKey = "abc123";
-
 // Toggle availability for an item
-app.MapPatch("/api/availability/{itemId:int}", async (
+api.MapPatch("availability/{itemId:int}", async (
     int itemId,
-    [FromQuery(Name = "k")] string k,
     [FromBody] ToggleRequest req,
     AppDbContext db) =>
 {
-    if (k != SecretKey) return Results.Unauthorized();
-
     if (!await db.Items.AnyAsync(i => i.Id == itemId))
         return Results.NotFound($"Item {itemId} not found");
 
@@ -91,13 +93,11 @@ app.MapPatch("/api/availability/{itemId:int}", async (
 });
 
 // Suggest existing items by prefix (case-insensitive)
-app.MapGet("/api/items", async (
+api.MapGet("items", async (
     [FromQuery] string? prefix,
     [FromQuery] int? limit,
-    [FromQuery(Name = "k")] string k,
     AppDbContext db) =>
 {
-    if (k != SecretKey) return Results.Unauthorized();
     if (string.IsNullOrWhiteSpace(prefix)) return Results.BadRequest();
 
     var max = Math.Clamp(limit ?? 10, 1, 50);
@@ -115,12 +115,10 @@ app.MapGet("/api/items", async (
 });
 
 // Add a new master item
-app.MapPost("/api/items", async (
+api.MapPost("items", async (
     [FromBody] CreateItemRequest req,
-    [FromQuery(Name = "k")] string k,
     AppDbContext db) =>
 {
-    if (k != SecretKey) return Results.Unauthorized();
     if (string.IsNullOrWhiteSpace(req.Name) || req.CategoryId <= 0)
         return Results.BadRequest("Name and CategoryId are required");
 
